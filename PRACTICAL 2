@@ -1,0 +1,85 @@
+-- BEGIN PRACtICAL 2
+
+create database cs_db;
+use cs_db;
+create table Client_Master (Client_no varchar(6), Name varchar(20), City varchar(15), Pincode numeric(8), State varchar(15), Bal_due numeric(10,2));
+insert into Client_Master values ("C001", "Ivan", "Bombay", 400054, "Maharashtra", 15000);
+insert into Client_Master values ("C002", "Vandana", "Madras", 780001, "Tamilnadu", 0);
+insert into Client_Master values ("C003", "Pramada", "Bombay", 400057, "Maharashtra", 5000);
+insert into Client_Master values ("C004", "Basu", "Bombay", 400056, "Maharashtra", 0);
+insert into Client_Master values ("C005", "Ravi", "Delhi", 100001, "Gujarat", 2000);
+insert into Client_Master values ("C0006", "Rukmani", "Bombay", 400050, "Maharashtra", 0);
+-- select* from Client_Master;
+-- desc Client_Master;
+
+create table Product_Master (Product_no varchar(6), Description varchar(15), P_percent numeric(4,2), U_measure varchar(10), Qty_on_hand numeric(8), Reorder_lvl numeric(8), Sell_price numeric(8,2), Cost_price numeric(8,2));
+insert into Product_Master values ("P001", "Floppies", 5, "Piece", 100, 20, 525, 500);
+insert into Product_Master values ("P002", "Monitor", 6, "Piece", 10, 3, 12000, 11280);
+insert into Product_Master values ("P003", "Mouse", 5, "Piece", 20, 5, 1050, 1000);
+insert into Product_Master values ("P004", "Floppies", 5, "Piece", 100, 20, 525, 500);
+insert into Product_Master values ("P005", "Keyboards", 2, "Piece", 10, 3, 3150, 3050);
+insert into Product_Master values ("P006", "CD Drive", 2.5, "Piece", 10, 3, 5250, 5100);
+insert into Product_Master values ("P006", "CD Drive", 2.5, "Piece", 10, 3, 5250, 5100);
+insert into Product_Master values ("P007", "1.44 Drive", 4, "Piece", 10, 3, 8400, 8000);
+-- select* from Product_Master;
+-- select product_no, Sell_price, Cost_price  from Product_Master;
+desc Product_Master;
+
+create table Salesman_Master (S_no varchar(6), S_Name varchar(20), City varchar(20), Pincode numeric(8), State varchar(20), Sal_amt numeric(8,2), Tgt_to_get numeric(6,2), Ytd_sales numeric(6,2), remarks varchar(12));
+insert into Salesman_Master values ("S001", "Kiran", "Bombay", 400002, "Maharashtra", 3000, 100, 50, "Excellent");
+insert into Salesman_Master values ("S002", "Manish", "Bombay", 400001, "Maharashtra", 3000, 200, 100, "Good");
+insert into Salesman_Master values ("S003", "Ravi", "Bombay", 400032, "Maharashtra", 3000, 200, 100, "Average");
+insert into Salesman_Master values ("S004", "Ashish", "Bombay", 400044, "Maharashtra", 3500, 200, 150, "Good");
+-- select* from Salesman_Master;
+select s_no,s_name, remarks, sal_amt from Salesman_Master;
+desc Salesman_Master;
+-- drop table Salesman_Master;
+show tables;
+
+
+-- Section A
+select Name from Client_Master;
+select Name, City from Client_Master;
+select Description from Product_Master;
+select Name from Client_Master where (City = "Bombay");
+select S_Name from Salesman_Master where (Sal_amt = "3000");
+select distinct Name from Client_Master;
+select * from Product_Master order by Sell_Price ;
+select * from Product_Master order by Sell_Price , Cost_price ;
+select Product_no, Description from Product_Master order by Sell_Price desc ;
+
+-- Section B
+
+update Client_Master set City = "Bombay" where Client_no='C002';
+update Client_Master set Bal_due = 1000 where Client_no='C001';
+-- select * from Client_Master;
+update Product_Master set Cost_price = 950 where Description='Floppies';
+update Salesman_Master set City = "Mumbai"; 
+-- select * from Salesman_Master
+
+-- Section C
+
+delete from Salesman_Master where Sal_amt = 3500;
+select * from Salesman_Master;
+delete from Product_Master where Qty_on_hand = 100;
+delete from Client_Master where State = "Tamilnadu";
+
+-- Section D
+
+alter table Client_Master add column telephone numeric(10);
+alter table Product_Master modify Sell_price numeric(10,2);
+alter table Client_Master change telephone contact numeric;
+alter table Client_Master drop contact;
+desc Client_Master;
+
+
+-- Section E
+desc Employee;
+drop table Employee;
+show tables;
+
+-- Section F
+rename table Salesman_Master to Sman_Mast;
+show tables;
+
+-- END OF PRACTICAL
