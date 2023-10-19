@@ -1,0 +1,59 @@
+create database prac7_db;
+CREATE TABLE Employee (
+  eid INT PRIMARY KEY,
+  ename VARCHAR(50) NOT NULL,
+  Address VARCHAR(50) NOT NULL,
+  dept VARCHAR(50) NOT NULL,
+  salary NUMERIC NOT NULL
+);
+
+INSERT INTO Employee (eid, ename, Address, dept, salary)
+VALUES (1, 'Ram', 'chd', 'HR', 10000),
+       (2, 'Amit', 'delhi', 'MRKT', 20000),
+       (3, 'Ravi', 'pune', 'HR', 30000),
+       (4, 'Nitin', 'bang', 'MRKT', 40000),
+       (5, 'Varun', 'chd', 'IT', 50000);
+       
+CREATE TABLE Project (
+  Eid NUMERIC,
+  Pid VARCHAR(20) PRIMARY KEY CHECK (Pid LIKE 'P%'),
+  pname VARCHAR(50),
+  Location VARCHAR(50)
+);       
+
+INSERT INTO Project (Eid, Pid, pname, Location)
+VALUES (1, 'P1', 'IOT', 'bang'),
+       (5, 'P2', 'BIG Data', 'delhi'),
+       (3, 'P3', 'Retail', 'mumbai'),
+       (4, 'P4', 'Android', 'hyderabad');
+       
+-- Que 1
+SELECT ename, salary FROM Employee WHERE salary = (SELECT MAX(salary) FROM Employee);
+
+-- Que 2
+SELECT ename FROM Employee WHERE salary = (SELECT MAX(salary) FROM Employee);
+
+-- Que 3
+SELECT MAX(salary) AS Salary FROM Employee WHERE salary < (SELECT MAX(salary) FROM Employee);
+
+-- Que 4
+SELECT ename FROM Employee WHERE salary = (SELECT MAX(salary) FROM Employee WHERE salary < (SELECT MAX(salary) FROM Employee));
+
+-- Que 5
+SELECT dept, COUNT(*) AS num_of_employees FROM employee GROUP BY dept;
+
+-- Que 6
+SELECT ename FROM employee WHERE dept IN (SELECT dept FROM employee GROUP BY dept HAVING COUNT(*) < 2);
+
+-- Que 7
+SELECT ename FROM employee  WHERE dept IN (SELECT dept FROM employee GROUP BY dept HAVING COUNT(*) < 2);
+
+-- Que 8
+SELECT dept, ename, salary FROM employee WHERE (dept, salary) IN (SELECT dept, MAX(salary) FROM employee GROUP BY dept);
+
+-- Que 9
+SELECT e.ename FROM employee e JOIN project p ON e.Eid = p.Eid;
+
+-- Que 10
+SELECT DISTINCT e.* FROM employee e INNER JOIN project p ON e.Eid = p.Eid;
+
