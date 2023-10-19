@@ -1,3 +1,4 @@
+// Begin
 -- Que 1
 SELECT product_no, description FROM product_master WHERE product_no NOT IN (SELECT product_no FROM sales_order_details);
 
