@@ -1,0 +1,91 @@
+use cs_db;
+create table sales_order (Order_no varchar(6), Order_date date, Client_no varchar(6), S_no varchar(6), Dely_type char(1), Billed_yn char(1), Dely_date date, Order_status varchar(10));
+insert into sales_order values ("O1901", "2015-06-12", "C001", "S001", "F", "N", "2015-06-20", "InProcess");
+insert into sales_order values ("O1902", "2015-01-25", "C002", "S002", "P", "N", "2015-06-27", "Cancelled");
+insert into sales_order values ("O4665", "2015-02-18", "C003", "S003", "F", "Y", "2015-02-20", "Fullfilled");
+insert into sales_order values ("O1903", "2015-04-03", "C001", "S001", "F", "Y", "2015-04-07", "Fullfilled");
+insert into sales_order values ("O4666", "2015-05-20", "C004", "S002", "P", "N", "2015-05-22", "Cancelled");
+insert into sales_order values ("O1908", "2015-05-24", "C005", "S003", "F", "N", "2015-05-26", "InProcess");
+
+-- Section 1
+-- Que 1
+show tables;
+SELECT * FROM client_master;
+SELECT Name FROM client_master WHERE Name LIKE '_a%';
+
+-- Que 2
+SELECT name FROM client_master WHERE Name LIKE '_a__';
+
+-- Que 3
+SELECT city FROM client_master WHERE city LIKE '%a_';
+
+-- Que 4
+SELECT * FROM client_master WHERE bal_due >= 10000;
+
+-- Que 5
+SELECT * FROM sales_order WHERE Order_date BETWEEN '2015-01-01' AND '2015-01-31';
+
+-- Que 6
+SELECT * FROM client_master WHERE Client_no IN ("C003","C001"); 
+
+-- Que 7
+SELECT * FROM product_master WHERE Sell_price > 2000 AND Sell_price <= 5000;
+
+-- Que 8
+select * from Product_Master;
+select Description, Sell_price, Sell_price *0.15 As new_price from Product_Master where Sell_price > 1500;
+
+-- Que 9
+SELECT name, city, state FROM Client_Master WHERE state != 'Maharashtra';
+
+-- Que 10
+select count(*) as Total from sales_order;
+
+-- Que 11
+select avg(sell_price) as avg_price from Product_Master;
+
+-- Que 12
+SELECT MAX(Sell_price) AS max_price, MIN(Sell_price) AS min_price FROM product_master;
+
+-- Que 13
+SELECT COUNT(*) AS Count FROM product_master WHERE Sell_price >= 1500;
+
+select * from Product_Master;
+
+-- Que 14
+SELECT * FROM product_master WHERE qty_on_hand < Reorder_lvl;
+
+-- Que 15
+create table cmaster as select * from Client_Master; -- cmaster like client_master
+
+-- Que 16
+INSERT INTO cmaster SELECT * FROM client_master WHERE city = 'bombay';
+
+-- Que 17
+CREATE TABLE sales AS SELECT order_no, client_no FROM sales_order;
+
+-- Que 18
+INSERT INTO sales (order_no, client_no) SELECT order_no, client_no FROM sales_order;
+
+select * from sales_order;
+
+-- Section 2
+-- Que 1
+select Order_no, day(Order_date) as order_day from sales_order;
+
+-- Que 2
+SELECT  DATE_FORMAT(Order_date, '%M') as month,   DAY(Order_date) as day FROM sales_order;
+
+-- Que 3
+SELECT DATEDIFF(Dely_date, Order_date) AS days_elapsed from sales_order;
+
+-- Que 4
+SELECT DATE_ADD(CURDATE(), INTERVAL 15 DAY) AS after_date;
+
+-- Que 5
+select now() as Current;
+
+-- Que 6
+select curtime() as current_sys_time;
+
+-- ***************** --
