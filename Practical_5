@@ -1,0 +1,67 @@
+CREATE TABLE emp_mstr (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    job_name VARCHAR(50),
+    hire_date DATE,
+    salary DECIMAL(10, 2),
+    dep_id INT
+);
+
+-- Insert data into the table
+INSERT INTO emp_mstr (emp_id, emp_name, job_name, hire_date, salary, dep_id) VALUES
+(68319, 'KAYLING', 'PRESIDENT', '1991-11-18', 6000, 1001),
+(66928, 'BLAZE', 'MANAGER', '1991-05-01', 2750, 3001),
+(67832, 'CLARE', 'MANAGER', '1991-06-09', 2550, 1001),
+(65646, 'JONAS', 'MANAGER', '1991-04-02', 2957, 2001),
+(67858, 'SCARLET', 'ANALYST', '1997-04-19', 3100, 2001),
+(69062, 'FRANK', 'ANALYST', '1991-12-03', 3100, 2001),
+(63679, 'SANDRINE', 'CLERK', '1990-12-18', 900, 2001),
+(64989, 'ADELYN', 'SALESMAN', '1991-02-20', 1700, 3001),
+(65271, 'WADE', 'SALESMAN', '1991-02-22', 1350, 3001),
+(66564, 'MADDEN', 'SALESMAN', '1991-09-28', 1350, 3001),
+(68454, 'TUCKER', 'SALESMAN', '1991-09-08', 1600, 3001),
+(68736, 'ADNRES', 'CLERK', '1997-05-23', 1200, 2001),
+(69000, 'JULIUS', 'CLERK', '1991-12-03', 1050, 3001),
+(69324, 'MARKER', 'CLERK', '1992-01-23', 1400, 1001);
+
+-- Que 1
+SELECT dep_id, COUNT(*) FROM emp_mstr GROUP BY dep_id;
+
+-- Que 2
+SELECT dep_id, COUNT(DISTINCT jOb_name) FROM emp_mstr GROUP BY dep_id;
+
+-- Que 3
+SELECT DISTINCT emp_name, salary FROM  emp_mstr WHERE salary > 2000;
+
+-- Que 4
+SELECT COUNT(*) AS Total_EMP  FROM emp_mstr WHERE hire_date > '1991-04-03';
+
+-- Que 5
+SELECT job_name, COUNT(*) AS NO_OF_EMP FROM emp_mstr GROUP BY job_name ORDER BY NO_OF_EMP ASC;
+
+-- Que 6
+SELECT dep_id, COUNT(*) FROM emp_mstr GROUP BY dep_id HAVING dep_id > 3;
+
+-- Que 7
+SELECT dep_id, SUM(salary) FROM emp_mstr GROUP BY dep_id;
+
+-- Que 8
+SELECT dep_id, COUNT(*) AS TOTAL_EMP FROM emp_mstr  WHERE emp_name LIKE  '%N' GROUP BY dep_id;
+
+-- Que 9
+SELECT dep_id, COUNT(*) FROM emp_mstr WHERE emp_name LIKE '%A%' GROUP BY dep_id;
+
+-- Que 10
+SELECT dep_id, COUNT(emp_id) FROM emp_mstr e1 WHERE salary > (SELECT AVG (salary) FROM emp_mstr e2 WHERE e1.dep_id = e2.dep_id) GROUP BY dep_id;
+
+-- Que 11
+SELECT dep_id, COUNT(*) AS emp_count FROM emp_mstr GROUP BY dep_id HAVING emp_count > 2 ORDER BY dep_id DESC;
+
+-- Que 12
+SELECT dep_id, AVG(salary) FROM emp_mstr GROUP BY  dep_id;
+
+-- Que 13
+SELECT dep_id, salary FROM emp_mstr WHERE (dep_id, salary)IN ( SELECT dep_id, MAX(salary) FROM emp_mstr GROUP BY dep_id);
+
+-- Que 14
+SELECT dep_id, MIN(salary) AS min_salary FROM emp_mstr GROUP BY dep_id;
