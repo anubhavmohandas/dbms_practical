@@ -1,0 +1,73 @@
+-- Que 1
+SELECT product_no, description FROM product_master WHERE product_no NOT IN (SELECT product_no FROM sales_order_details);
+
+-- Que 2
+SELECT name,city, pincode FROM client_master WHERE Client_no = (SELECT Client_no FROM sales_order WHERE order_no = 'O1901');
+
+-- Que 3
+SELECT Client_no,Name 
+FROM client_master 
+WHERE Client_no IN (SELECT Client_no FROM sales_order 
+WHERE Order_no IN (SELECT Order_no FROM sales_order
+WHERE Order_no IN (SELECT Order_no FROM sales_order_details WHERE Product_no 
+IN (SELECT Product_no FROM product_master WHERE Description LIKE('%Mouse%')))));
+
+-- Section 2
+-- Que 1
+SELECT product_master.description, SUM(sales_order_details.qty_disp) AS total_qty_disp
+FROM product_master
+INNER JOIN sales_order_details 
+ON product_master.product_no = sales_order_details.product_no
+GROUP BY product_master.product_no;
+
+-- Que 2
+SELECT Description,SUM(Qty_disp*Product_rate) AS sold_values
+FROM product_master AS P,sales_order_details AS sol 
+WHERE P.Product_no=sol.Product_no 
+AND Qty_disp > 0 
+GROUP BY P.Product_no;
+
+-- Que 3
+-- SELECT SUM(SO.Total) AS JanuaryBill FROM Sales_order SO WHERE SO.Billed_yn = 'Y' AND MONTH(SO.Order_date) = 1;
+SELECT sales_order_details.Order_no,SUM(Qty_ordered) AS orders
+FROM sales_order_details,sales_order 
+WHERE sales_order.Order_no = sales_order_details.Order_no 
+AND sales_order.Billed_yn = 'Y' 
+AND MONTH(sales_order.Order_date) = '1' 
+GROUP BY sales_order_details.Order_no;
+
+-- Sec 3
+-- Que 1 
+SELECT product_master.product_no, product_master.description
+FROM product_master
+INNER JOIN sales_order_details ON product_master.product_no = sales_order_details.product_no
+INNER JOIN sales_order ON sales_order_details.order_no = sales_order.order_no
+INNER JOIN client_master ON sales_order.client_no = client_master.client_no
+WHERE client_master.name = 'Ivan';
+
+-- Que 2
+SELECT product_master.product_no, product_master.description
+FROM product_master
+INNER JOIN sales_order_details ON product_master.product_no = sales_order_details.product_no
+INNER JOIN sales_order ON sales_order_details.order_no = sales_order.order_no
+INNER JOIN client_master ON sales_order.client_no = client_master.client_no
+WHERE client_master.client_no = 'C001';
+
+-- Que 3
+SELECT name FROM client_master AS c1 INNER JOIN sales_order AS s1 ON
+c1.Client_no = s1.Client_no INNER JOIN sales_order_details AS So1 ON s1.Order_no
+=So1.Order_no INNER JOIN product_master AS p1 ON so1.Product_no = p1.Product_no
+AND p1.Product_no ='P005' ;
+
+-- Que 4
+SELECT order_no,so1.product_no FROM sales_order_details AS so1 INNER JOIN
+product_master AS p1 ON so1.Product_no = p1.Product_no AND so1.Qty_ordered < 4 AND
+p1.Product_no='p003';
+
+-- Sec 4
+-- Que 1
+SELECT CONCAT(Description, ' Worth Rs. ', Qty_ordered * Sell_price, ' was sold') AS sales_info
+FROM product_master
+NATURAL JOIN sales_order_details;
+
+-- ******************** --
