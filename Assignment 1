@@ -1,0 +1,260 @@
+-- create database assignment;
+
+-- Create Department table
+CREATE TABLE Department (
+    Dno INT PRIMARY KEY,
+    Dname VARCHAR(255)
+);
+
+-- Create Branch table
+CREATE TABLE Branch (
+    Bcode INT PRIMARY KEY,
+    Bname VARCHAR(255),
+    Dno INT,
+    FOREIGN KEY (Dno) REFERENCES Department(Dno)
+);
+
+-- Create Course table
+CREATE TABLE Course (
+    Ccode INT PRIMARY KEY,
+    Cname VARCHAR(255),
+    Credits INT,
+    Dno INT,
+    FOREIGN KEY (Dno) REFERENCES Department(Dno)
+);
+
+-- Create Branch_Course table
+CREATE TABLE Branch_Course (
+    Bcode INT,
+    Ccode INT,
+    Semester VARCHAR(20),
+    PRIMARY KEY (Bcode, Ccode),
+    FOREIGN KEY (Bcode) REFERENCES Branch(Bcode),
+    FOREIGN KEY (Ccode) REFERENCES Course(Ccode)
+);
+
+-- Create Student table
+CREATE TABLE Student (
+    Rollno INT PRIMARY KEY,
+    Name VARCHAR(255),
+    Dob DATE,
+    Gender CHAR(1),
+    Doa DATE,
+    Bcode INT,
+    FOREIGN KEY (Bcode) REFERENCES Branch(Bcode)
+);
+
+-- Create Enrolls table
+CREATE TABLE Enrolls (
+    Rollno INT,
+    Ccode INT,
+    Sess VARCHAR(20),
+    Grade CHAR(1),
+    PRIMARY KEY (Rollno, Ccode, Sess),
+    FOREIGN KEY (Rollno) REFERENCES Student(Rollno),
+    FOREIGN KEY (Ccode) REFERENCES Course(Ccode)
+);
+
+
+-- Check constraint for Gender in Student table
+ALTER TABLE Student
+ADD CONSTRAINT CHK_Gender CHECK (Gender IN ('M', 'F'));
+
+-- Check constraint for Date of Admission in Student table for MySQL
+ALTER TABLE Student
+ADD CONSTRAINT CHK_Doa CHECK (STR_TO_DATE(Doa, '%Y-%m-%d') IS NOT NULL);
+
+-- Check constraint for Grade in Enrolls table
+ALTER TABLE Enrolls
+ADD CONSTRAINT CHK_Grade CHECK (Grade IN ('S', 'A', 'B', 'C', 'D', 'E', 'U'));
+
+-- Questions 1:
+SELECT D.Dno, D.Dname, COUNT(B.Bcode) AS NumBranches
+FROM Department D
+JOIN Branch B ON D.Dno = B.Dno
+GROUP BY D.Dno, D.Dname
+HAVING COUNT(B.Bcode) > 3;
+
+-- Question 2
+SELECT D.Dno, D.Dname, COUNT(C.Ccode) AS NumCourses
+FROM Department D
+LEFT JOIN Course C ON D.Dno = C.Dno
+GROUP BY D.Dno, D.Dname
+HAVING COUNT(C.Ccode) > 6;
+
+-- Question 3
+SELECT C.Ccode, C.Cname, COUNT(BC.Bcode) AS NumBranches
+FROM Course C
+JOIN Branch_Course BC ON C.Ccode = BC.Ccode
+GROUP BY C.Ccode, C.Cname
+HAVING COUNT(BC.Bcode) > 3;
+
+-- Question 4
+SELECT E.Rollno, S.Name
+FROM Enrolls E
+JOIN Student S ON E.Rollno = S.Rollno
+WHERE E.Grade = 'S'
+GROUP BY E.Rollno, S.Name
+HAVING COUNT(E.Ccode) > 2;
+
+-- Question 5
+CREATE VIEW SuccessfulCoursesView AS
+SELECT E.Rollno, S.Name, COUNT(E.Ccode) AS NumSuccessfulCourses
+FROM Enrolls E
+JOIN Student S ON E.Rollno = S.Rollno
+WHERE E.Grade IN ('A', 'B', 'C', 'D', 'E')
+GROUP BY E.Rollno, S.Name;
+
+SELECT * FROM SuccessfulCoursesView;
+
+
+
+
+-- -------------------------------------------------------------------------
+
+-- Section B
+
+-- Create Customer Table
+CREATE TABLE Customer (
+    Customerno VARCHAR(5) CONSTRAINT CHK_Customerno CHECK (Customerno LIKE 'C%'),
+    Cname VARCHAR(50)
+);
+
+-- Create Cust_Order Table
+CREATE TABLE Cust_Order (
+    Orderno VARCHAR(5) CONSTRAINT CHK_Orderno CHECK (Orderno LIKE 'O%'),
+    Odate DATE,
+    Customerno VARCHAR(5),
+    Ord_amt NUMERIC(8) DEFAULT 0,
+    CONSTRAINT FK_Customer FOREIGN KEY (Customerno) REFERENCES Customer(Customerno)
+);
+
+-- Create Item Table
+CREATE TABLE Item (
+    Itemno VARCHAR(5) CONSTRAINT CHK_Itemno CHECK (Itemno LIKE 'I%'),
+    Item_name VARCHAR(30),
+    Unit_price NUMERIC(5)
+);
+
+-- Create Order_item Table
+CREATE TABLE Order_item (
+    Orderno VARCHAR(5),
+    Itemno VARCHAR(5),
+    Qty NUMERIC(3),
+    CONSTRAINT FK_Cust_Order FOREIGN KEY (Orderno) REFERENCES Cust_Order(Orderno),
+    CONSTRAINT FK_Item FOREIGN KEY (Itemno) REFERENCES Item(Itemno)
+);
+
+
+-- Questions
+-- Question 1
+-- Create Customer Table
+CREATE TABLE Customer (
+    Customerno VARCHAR(5) PRIMARY KEY,
+    Cname VARCHAR(50),
+    CHECK (Customerno LIKE 'C%')
+);
+
+-- Create Cust_Order Table
+CREATE TABLE Cust_Order (
+    Orderno VARCHAR(5) PRIMARY KEY,
+    Odate DATE,
+    Customerno VARCHAR(5),
+    Ord_amt DECIMAL(8, 2) DEFAULT 0,
+    CONSTRAINT FK_Customer FOREIGN KEY (Customerno) REFERENCES Customer(Customerno),
+    CHECK (Orderno LIKE 'O%')
+);
+
+-- Create Item Table
+CREATE TABLE Item (
+    Itemno VARCHAR(5) PRIMARY KEY,
+    Item_name VARCHAR(30),
+    Unit_price DECIMAL(8, 2),
+    CHECK (Itemno LIKE 'I%')
+);
+
+-- Create Order_item Table
+CREATE TABLE Order_item (
+    Orderno VARCHAR(5),
+    Itemno VARCHAR(5),
+    Qty INT,
+    CONSTRAINT FK_Cust_Order FOREIGN KEY (Orderno) REFERENCES Cust_Order(Orderno),
+    CONSTRAINT FK_Item FOREIGN KEY (Itemno) REFERENCES Item(Itemno)
+);
+
+-- Question 2
+-- Populate Customer Table
+INSERT INTO Customer (Customerno, Cname) VALUES
+('C001', 'John'),
+('C002', 'Smith'),
+('C003', 'Alice');
+
+-- Populate Cust_Order Table
+INSERT INTO Cust_Order (Orderno, Odate, Customerno, Ord_amt) VALUES
+('O001', '2023-01-15', 'C001', 500.00),
+('O002', '2023-02-20', 'C002', 750.00),
+('O003', '2023-03-10', 'C003', 600.00);
+
+-- Alter Item Table to increase the size of the Unit_price column
+ALTER TABLE Item
+MODIFY COLUMN Unit_price DECIMAL(8, 2);
+
+-- Populate Item Table
+INSERT INTO Item (Itemno, Item_name, Unit_price) VALUES
+('I001', 'Laptop', 1200.00),
+('I002', 'Smartphone', 700.00),
+('I003', 'Tablet', 400.00);
+
+
+-- Populate Order_item Table
+INSERT INTO Order_item (Orderno, Itemno, Qty) VALUES
+('O001', 'I001', 2),
+('O002', 'I002', 1),
+('O003', 'I003', 3);
+
+-- Question 3
+SELECT C.Customerno, C.Cname, COUNT(O.Orderno) AS NumOrders
+FROM Customer C
+JOIN Cust_Order O ON C.Customerno = O.Customerno
+GROUP BY C.Customerno, C.Cname
+HAVING COUNT(O.Orderno) > 3;
+
+-- Question 4
+SELECT O.Orderno, I.Itemno, I.Item_name, I.Unit_price
+FROM Cust_Order O
+JOIN Order_item P ON O.Orderno = P.Orderno
+JOIN Item I ON P.Itemno = I.Itemno
+WHERE I.Unit_price < (
+    SELECT AVG(I2.Unit_price)
+    FROM Order_item P2
+    JOIN Item I2 ON P2.Itemno = I2.Itemno
+    WHERE P2.Orderno = O.Orderno
+);
+
+-- Question 5
+SELECT O.Orderno, COUNT(P.Itemno) AS NumItems
+FROM Cust_Order O
+LEFT JOIN Order_item P ON O.Orderno = P.Orderno
+GROUP BY O.Orderno;
+
+-- Question 6
+SELECT I.Itemno, I.Item_name, I.Unit_price
+FROM Item I
+JOIN Order_item P ON I.Itemno = P.Itemno
+GROUP BY I.Itemno, I.Item_name, I.Unit_price
+HAVING COUNT(DISTINCT P.Orderno) >= 0.25 * (SELECT COUNT(DISTINCT Orderno) FROM Cust_Order);
+
+-- Question 7
+UPDATE Cust_Order
+SET Ord_amt = Ord_amt * 1.1;
+
+-- Question 8
+CREATE VIEW CustomerOrderCountView AS
+SELECT C.Customerno, C.Cname, COUNT(O.Orderno) AS NumOrders
+FROM Customer C
+LEFT JOIN Cust_Order O ON C.Customerno = O.Customerno
+GROUP BY C.Customerno, C.Cname;
+
+SELECT * FROM CustomerOrderCountView;
+
+-- END
