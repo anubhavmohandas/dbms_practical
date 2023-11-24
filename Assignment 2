@@ -1,0 +1,281 @@
+create database assignment;
+-- Questions
+-- Question 1:
+
+-- Create Dept Table
+CREATE TABLE Dept (
+    Deptno VARCHAR(5) PRIMARY KEY,
+    Name VARCHAR(30)
+);
+
+-- Create Staff Table
+CREATE TABLE Staff (
+    Staffno NUMERIC(5) PRIMARY KEY,
+    Name VARCHAR(30),
+    Dob DATE,
+    Gender CHAR(1) CHECK (Gender IN ('M', 'F')),
+    Doj DATE,
+    Designation VARCHAR(30),
+    Basic_pay NUMERIC(6),
+    Deptno VARCHAR(5),
+    CONSTRAINT FK_Staff_Dept FOREIGN KEY (Deptno) REFERENCES Dept(Deptno)
+);
+
+-- Create Skill Table
+CREATE TABLE Skill (
+    Skill_code VARCHAR(5) PRIMARY KEY,
+    Description VARCHAR(30),
+    Charge_Outrage NUMERIC(3)
+);
+
+-- Create Staff_skill Table
+CREATE TABLE Staff_skill (
+    Staffno NUMERIC(5),
+    Skill_code VARCHAR(5),
+    PRIMARY KEY (Staffno, Skill_code),
+    CONSTRAINT FK_Staff_skill_Staff FOREIGN KEY (Staffno) REFERENCES Staff(Staffno),
+    CONSTRAINT FK_Staff_skill_Skill FOREIGN KEY (Skill_code) REFERENCES Skill(Skill_code)
+);
+
+-- Create Project Table
+CREATE TABLE Project (
+    Projectno VARCHAR(5) PRIMARY KEY,
+    Pname VARCHAR(5),
+    Start_Date DATE,
+    End_Date DATE,
+    Project_Manager_Staffno NUMERIC(5),
+    CONSTRAINT CHK_Projectno CHECK (Projectno LIKE 'P%'),
+    CONSTRAINT FK_Project_Staff FOREIGN KEY (Project_Manager_Staffno) REFERENCES Staff(Staffno)
+);
+
+-- Create Works Table
+CREATE TABLE Works (
+    Staffno NUMERIC(5),
+    Projectno VARCHAR(5),
+    Date_Worked_On DATE,
+    Intime TIMESTAMP,
+    Outtime TIMESTAMP,
+    PRIMARY KEY (Staffno, Projectno),
+    CONSTRAINT FK_Works_Staff FOREIGN KEY (Staffno) REFERENCES Staff(Staffno),
+    CONSTRAINT FK_Works_Project FOREIGN KEY (Projectno) REFERENCES Project(Projectno)
+);
+
+-- Question 2:
+
+-- Populate Dept Table
+INSERT INTO Dept (Deptno, Name) VALUES
+('D001', 'Marketing'),
+('D002', 'Research'),
+('D003', 'Sales');
+
+-- Populate Skill Table
+INSERT INTO Skill (Skill_code, Description, Charge_Outrage) VALUES
+('S001', 'Marketing Strategy', 120),
+('S002', 'Data Analysis', 150),
+('S003', 'Sales Management', 130);
+
+-- Populate Staff Table
+INSERT INTO Staff (Staffno, Name, Dob, Gender, Doj, Designation, Basic_pay, Deptno) VALUES
+(1, 'Emily Johnson', '1992-07-22', 'F', '2018-03-01', 'Marketing Specialist', 58000, 'D001'),
+(2, 'Daniel Brown', '1985-12-10', 'M', '2019-02-15', 'Research Scientist', 65000, 'D002'),
+(3, 'Sophia Martinez', '1990-04-05', 'F', '2020-06-20', 'Sales Manager', 70000, 'D003');
+
+-- Populate Staff_skill Table
+INSERT INTO Staff_skill (Staffno, Skill_code) VALUES
+(1, 'S001'),
+(1, 'S003'),
+(2, 'S002'),
+(3, 'S003');
+
+-- Modify the Project table to allow longer Pname values
+ALTER TABLE Project
+MODIFY COLUMN Pname VARCHAR(50);
+
+-- Populate Project Table
+INSERT INTO Project (Projectno, Pname, Start_Date, End_Date, Project_Manager_Staffno) VALUES
+('P001', 'Product Launch', '2021-04-01', '2021-09-30', 1),
+('P002', 'Market Research', '2021-06-15', '2021-12-31', 2),
+('P003', 'Sales Campaign', '2021-05-01', '2021-08-31', 3);
+
+-- Populate Works Table
+INSERT INTO Works (Staffno, Projectno, Date_Worked_On, Intime, Outtime) VALUES
+(1, 'P001', '2021-05-10', '2021-05-10 09:00:00', '2021-05-10 18:00:00'),
+(1, 'P002', '2021-07-20', '2021-07-20 10:30:00', '2021-07-20 16:30:00'),
+(2, 'P002', '2021-08-05', '2021-08-05 08:45:00', '2021-08-05 17:30:00'),
+(3, 'P003', '2021-06-10', '2021-06-10 09:00:00', '2021-06-10 17:00:00');
+
+-- Question 3
+SELECT Deptno, COUNT(*) AS NumberOfStaff
+FROM Staff
+GROUP BY Deptno;
+
+-- Question 4
+SELECT * FROM Staff
+WHERE Basic_pay = (SELECT AVG(Basic_pay) FROM Staff);
+
+-- Question 5
+SELECT S.*
+FROM Staff S
+JOIN Staff_skill SS ON S.Staffno = SS.Staffno
+GROUP BY S.Staffno, S.Name, S.Dob, S.Gender, S.Doj, S.Designation, S.Basic_pay, S.Deptno
+HAVING COUNT(SS.Skill_code) > 3;
+
+-- Question 6
+SELECT DISTINCT S.*
+FROM Staff S
+JOIN Staff_skill SS ON S.Staffno = SS.Staffno
+JOIN Skill SK ON SS.Skill_code = SK.Skill_code
+WHERE SK.Charge_Outrage > 60;
+
+-- Question 7
+CREATE VIEW DepartmentSummary AS
+SELECT
+    D.Deptno,
+    D.Name AS DeptName,
+    COUNT(S.Staffno) AS NumEmployees,
+    SUM(S.Basic_pay) AS TotalBasicPay
+FROM
+    Dept D
+LEFT JOIN
+    Staff S ON D.Deptno = S.Deptno
+GROUP BY
+    D.Deptno, D.Name;
+
+-- Question 8
+SELECT
+    D.Deptno,
+    D.Name AS DeptName,
+    COUNT(S.Staffno) AS NumEmployees
+FROM
+    Dept D
+LEFT JOIN
+    Staff S ON D.Deptno = S.Deptno
+GROUP BY
+    D.Deptno, D.Name
+HAVING
+    COUNT(S.Staffno) > 5;
+
+-- Question 9
+SELECT
+    S.Staffno,
+    S.Name AS StaffName,
+    COUNT(SS.Skill_code) AS NumSkills
+FROM
+    Staff S
+JOIN
+    Staff_skill SS ON S.Staffno = SS.Staffno
+GROUP BY
+    S.Staffno, S.Name
+HAVING
+    COUNT(SS.Skill_code) > 3;
+
+-- SECTION B --
+-- Question 1
+
+-- Create Customer Table
+CREATE TABLE Customer (
+    Cid INT PRIMARY KEY,
+    Cname VARCHAR(50) NOT NULL
+);
+
+-- Create Branch Table
+CREATE TABLE Branch (
+    Bcode INT PRIMARY KEY,
+    Bname VARCHAR(50) NOT NULL
+);
+
+-- Create Account Table
+CREATE TABLE Account (
+    Ano INT PRIMARY KEY,
+    Atype CHAR(1) CHECK (Atype IN ('S', 'C')),
+    Balance DECIMAL(10, 2) DEFAULT 0,
+    Cid INT,
+    Bcode INT,
+    FOREIGN KEY (Cid) REFERENCES Customer(Cid),
+    FOREIGN KEY (Bcode) REFERENCES Branch(Bcode)
+);
+
+-- Create Transaction Table
+CREATE TABLE Transaction (
+    Tid INT PRIMARY KEY,
+    Ano INT,
+    Tttype CHAR(1) CHECK (Tttype IN ('D', 'W')),
+    Tdate DATE,
+    Tamount DECIMAL(10, 2),
+    FOREIGN KEY (Ano) REFERENCES Account(Ano)
+);
+
+select * from Transaction;
+
+-- Question 2
+-- Populate Customer Table
+INSERT INTO Customer (Cid, Cname) VALUES
+(1, 'John Doe'),
+(2, 'Jane Smith'),
+(3, 'Alice Johnson');
+
+-- Populate Branch Table
+INSERT INTO Branch (Bcode, Bname) VALUES
+(101, 'Main Branch'),
+(102, 'Downtown Branch'),
+(103, 'Suburb Branch');
+
+-- Populate Account Table
+INSERT INTO Account (Ano, Atype, Balance, Cid, Bcode) VALUES
+(1001, 'S', 5000.00, 1, 101),
+(1002, 'C', 10000.00, 2, 102),
+(1003, 'S', 7500.00, 3, 103),
+(1004, 'C', 12000.00, 1, 102);
+
+-- Populate Transaction Table
+INSERT INTO Transaction (Tid, Ano, Tttype, Tdate, Tamount) VALUES
+(2001, 1001, 'D', '2023-01-15', 1000.00),
+(2002, 1002, 'W', '2023-02-20', 500.00),
+(2003, 1003, 'D', '2023-03-10', 1500.00),
+(2004, 1004, 'W', '2023-04-05', 800.00),
+(2005, 1001, 'D', '2023-05-12', 1200.00);
+
+-- Question 3
+SELECT C.Cid, C.Cname FROM Customer C
+WHERE EXISTS (
+    SELECT 1
+    FROM Account A
+    WHERE A.Cid = C.Cid AND A.Atype = 'S'
+) AND EXISTS (
+    SELECT 1
+    FROM Account A
+    WHERE A.Cid = C.Cid AND A.Atype = 'C'
+);
+
+-- Question 4
+SELECT B.Bcode, B.Bname, COUNT(A.Ano) AS NumOfAccounts
+FROM Branch B
+LEFT JOIN Account A ON B.Bcode = A.Bcode
+GROUP BY B.Bcode, B.Bname;
+
+-- Question 5
+SELECT B.Bcode, B.Bname, COUNT(A.Ano) AS NumOfAccounts
+FROM Branch B
+LEFT JOIN Account A ON B.Bcode = A.Bcode
+GROUP BY B.Bcode, B.Bname
+HAVING COUNT(A.Ano) < (SELECT AVG(AccountCount) FROM (SELECT COUNT(Ano) AS AccountCount FROM Account GROUP BY Bcode) AS AvgCounts);
+
+-- Question 6
+SELECT C.Cid, C.Cname, COUNT(T.Tid) AS TransactionCount
+FROM Customer C
+JOIN Account A ON C.Cid = A.Cid
+JOIN Transaction T ON A.Ano = T.Ano
+WHERE DATE(T.Tdate) = '2023-04-05' 
+GROUP BY C.Cid, C.Cname
+HAVING COUNT(T.Tid) >= 3;
+
+-- Question 7
+CREATE VIEW BranchAccountCount AS
+SELECT B.Bcode, B.Bname, COUNT(A.Ano) AS AccountCount
+FROM Branch B
+LEFT JOIN Account A ON B.Bcode = A.Bcode
+GROUP BY B.Bcode, B.Bname;
+
+SELECT * FROM BranchAccountCount;
+
+-- END
